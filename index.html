@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bubble Pop</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      background: linear-gradient(180deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+      cursor: pointer;
+      user-select: none;
+    }
+    bubble {
+      position: absolute;
+      border-radius: 50%;
+      pointer-events: none;
+      animation: float-up linear forwards;
+    }
+    @keyframes float-up {
+      0% { opacity: 0.85; transform: translateY(0) scale(1); }
+      100% { opacity: 0; transform: translateY(-120vh) scale(0.5); }
+    }
+    #hint {
+      position: fixed;
+      bottom: 32px;
+      left: 50%;
+      transform: translateX(-50%);
+      color: rgba(255,255,255,0.4);
+      font-family: system-ui, sans-serif;
+      font-size: 15px;
+      pointer-events: none;
+      transition: opacity 1s;
+    }
+  </style>
+</head>
+<body>
+  <div id="hint">tap anywhere to spawn bubbles</div>
+  <script>
+    const COLORS = [
+      '#ff6b6b', '#feca57', '#48dbfb', '#1dd1a1',
+      '#ff9ff3', '#54a0ff', '#c8d6e5', '#f368e0',
+      '#00d2d3', '#ff9f43', '#ee5a24', '#6ab04c'
+    ];
+
+    let hintHidden = false;
+
+    function hideHint() {
+      if (!hintHidden) {
+        document.getElementById('hint').style.opacity = '0';
+        hintHidden = true;
+      }
+    }
+
+    function randomColor() {
+      return COLORS[Math.floor(Math.random() * COLORS.length)];
+    }
+
+    function spawnBubble(x, y) {
+      const el = document.createElement('bubble');
+      const size = 40 + Math.random() * 80;
+      const color = randomColor();
+
+      el.style.width  = size + 'px';
+      el.style.height = size + 'px';
+      el.style.left   = (x - size / 2) + 'px';
+      el.style.top    = (y - size / 2) + 'px';
+      el.style.background = `radial-gradient(circle at 35% 35%, ${color}88, ${color}44, transparent)`;
+      el.style.boxShadow = `0 0 ${size/2}px ${color}66`;
+
+      const duration = 2500 + Math.random() * 2000;
+      el.style.animationDuration = duration + 'ms';
+
+      document.body.appendChild(el);
+      setTimeout(() => el.remove(), duration);
+    }
+
+    document.body.addEventListener('click', e => {
+      hideHint();
+      // spawn a burst
+      const count = 3 + Math.floor(Math.random() * 4);
+      for (let i = 0; i < count; i++) {
+        const offsetX = (Math.random() - 0.5) * 80;
+        const offsetY = (Math.random() - 0.5) * 80;
+        setTimeout(() => spawnBubble(e.clientX + offsetX, e.clientY + offsetY), i * 40);
+      }
+    });
+  </script>
+</body>
+</html>
